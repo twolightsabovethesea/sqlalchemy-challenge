@@ -2,6 +2,52 @@
 
 from flask import Flask, jsonify
 
+#import other dependencies
+
+import sqlalchemy
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine, func, inspect
+
+import numpy as np
+import pandas as pd
+import datetime as dt
+
+# create engine to hawaii.sqlite
+engine = create_engine("sqlite:///hawaii.sqlite", echo=False)
+
+# reflect an existing database into a new model
+Base = automap_base()
+
+# reflect the tables
+
+Base.prepare(engine, reflect=True)
+
+# View all of the classes that automap found
+
+Base.classes.keys()
+
+# Save references to each table
+
+Measurement = Base.classes.measurement
+
+Station = Base.classes.station
+
+# Create our session (link) from Python to the DB
+session = Session(engine)
+
+one_year = dt.date(2017,8,23) - dt.timedelta(days=365)
+
+one_year
+
+q = session.query(Measurement.date, Measurement.prcp).\
+    filter(Measurement.date >= one_year)
+q_dict = {}
+for i in q:
+    q_dict[i[0]]=i[1]
+
+
+
 # create an app using __name__
 
 app = Flask(__name__)
@@ -29,18 +75,21 @@ def home():
         f" <br>"
         f"Start-End - return min, max, and average temperatures in JSON format from a specified time period using start and end dates: <br>"
         f"/api/v1.0/<start>"
+    )
 
 #create precitipation route
 
 @app.route("/api/v1.0/precipitation")
 def precipitation():
     print("Server recieved request for 'precipitation' page")
+    return jsonify(q_dict)
     
 #create stations route
 
 @app.route("/api/v1.0/stations")
 def stations():
     print("Server recieved request for 'precipitation' page")
+    
 
     
 # create tobs route
@@ -60,5 +109,5 @@ def start():
 def start_end():
     print("Server recieved request for 'start_end' page")
     
-if name == "__main__":
+if __name__ == "__main__":
     app.run(debug=True)
