@@ -36,6 +36,9 @@ Station = Base.classes.station
 # Create our session (link) from Python to the DB
 session = Session(engine)
 
+##
+# include query for precitipation route
+
 one_year = dt.date(2017,8,23) - dt.timedelta(days=365)
 
 one_year
@@ -45,6 +48,25 @@ q = session.query(Measurement.date, Measurement.prcp).\
 q_dict = {}
 for i in q:
     q_dict[i[0]]=i[1]
+
+##
+# include query for stations route
+
+stationdata = session.query(Measurement.station, func.count(Measurement.station)).\
+group_by(Measurement.station).order_by(func.count(Measurement.station).desc()).all()
+stationdata_dict = {}
+for s in stationdata:
+    stationdata_dict[s[0]] = s[1]
+
+##
+# include query for temperature observations route
+
+temps = session.query(Measurement.date, Measurement.tobs).\
+    filter(Measurement.station == 'USC00519281').\
+    filter(Measurement.date >= one_year)
+temps_dict = {}
+for temp in temps:
+    temps_dict[temp[0]] = temp[1]
 
 
 
@@ -89,6 +111,7 @@ def precipitation():
 @app.route("/api/v1.0/stations")
 def stations():
     print("Server recieved request for 'precipitation' page")
+    return jsonify(stationdata_dict)
     
 
     
@@ -97,6 +120,7 @@ def stations():
 @app.route("/api/v1.0/tobs")
 def tobs():
     print("Server recieved request for 'tobs' page")
+    return jsonify(temps_dict)
 #create start route
 
 @app.route("/api/v1.0/<start>")
