@@ -126,7 +126,7 @@ def tobs():
 #create start route
 
 @app.route("/api/v1.0/<start>")
-def start(start):
+def start(start.strptime()):
     print("Server recieved request for 'start' page")
     start_temps_dict = {}
     start_temps = session.query(func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
@@ -139,7 +139,7 @@ def start(start):
 #create start/end route
 
 @app.route("/api/v1.0/<start>/<end>")
-def start_end(start,end):
+def start_end(start.strptime(),end.strptime()):
     print("Server recieved request for 'start_end' page")
     start_end_dict = {}
     start_end = session.query(func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
