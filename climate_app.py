@@ -126,11 +126,11 @@ def tobs():
 #create start route
 
 @app.route("/api/v1.0/<start>")
-def start(start.strptime()):
+def start(start):
     print("Server recieved request for 'start' page")
     start_temps_dict = {}
     start_temps = session.query(func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
-    filter(Measurement.date >= start).all()
+    filter(Measurement.date >= start.strptime()).all()
     for k in start_temps:
         start_temps_dict['TMIN'] = k[0]
         start_temps_dict['TMAX'] = k[1]
@@ -138,17 +138,17 @@ def start(start.strptime()):
     
 #create start/end route
 
-@app.route("/api/v1.0/<start>/<end>")
-def start_end(start.strptime(),end.strptime()):
-    print("Server recieved request for 'start_end' page")
-    start_end_dict = {}
-    start_end = session.query(func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
-    filter(Measurement.date >= start)
-    filter(Measurement.date <= end).all()
-    for d in start_temps:
-        start_temps_dict['TMIN'] = d[0]
-        start_temps_dict['TMAX'] = d[1]
-        start_temps_dict['TAVG'] = d[2]
+#@app.route("/api/v1.0/<start>/<end>")
+#def start_end(start.strptime(),end):
+#    print("Server recieved request for 'start_end' page")
+#    start_end_dict = {}
+#    start_end = session.query(func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
+#    filter(Measurement.date >= start.strptime())
+#    filter(Measurement.date <= end.strptime()).all()
+#    for d in start_temps:
+#        start_temps_dict['TMIN'] = d[0]
+#        start_temps_dict['TMAX'] = d[1]
+#        start_temps_dict['TAVG'] = d[2]
     
 if __name__ == "__main__":
     app.run(debug=True)
