@@ -67,6 +67,7 @@ temps = session.query(Measurement.date, Measurement.tobs).\
 temps_dict = {}
 for temp in temps:
     temps_dict[temp[0]] = temp[1]
+    
 
 
 
@@ -121,17 +122,33 @@ def stations():
 def tobs():
     print("Server recieved request for 'tobs' page")
     return jsonify(temps_dict)
+
 #create start route
 
 @app.route("/api/v1.0/<start>")
-def start():
+def start(start):
     print("Server recieved request for 'start' page")
+    start_temps_dict = {}
+    start_temps = session.query(func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
+    filter(Measurement.date >= start).all()
+    for k in start_temps:
+        start_temps_dict['TMIN'] = k[0]
+        start_temps_dict['TMAX'] = k[1]
+        start_temps_dict['TAVG'] = k[2]
     
 #create start/end route
 
 @app.route("/api/v1.0/<start>/<end>")
-def start_end():
+def start_end(start,end):
     print("Server recieved request for 'start_end' page")
+    start_end_dict = {}
+    start_end = session.query(func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
+    filter(Measurement.date >= start)
+    filter(Measurement.date <= end).all()
+    for d in start_temps:
+        start_temps_dict['TMIN'] = d[0]
+        start_temps_dict['TMAX'] = d[1]
+        start_temps_dict['TAVG'] = d[2]
     
 if __name__ == "__main__":
     app.run(debug=True)
